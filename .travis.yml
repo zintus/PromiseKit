@@ -164,12 +164,18 @@ jobs:
       osx_image: xcode10.2
       name: 'macOS / swift-tools-version: 5.0 / Swift 5.0.0'
 
+<<<<<<< HEAD
     - name: '`pod trunk push`'
       stage: deploy
       install: gem install cocoapods --pre -v 1.7.0.beta.3
       before_script: |
         mv .github/PromiseKit.podspec .
         sed -i '' "s/s.version = '0.0.1'/s.version = '$TRAVIS_TAG'/g" PromiseKit.podspec
+=======
+    - stage: deploy
+      install: gem install cocoapods --pre -v 1.7.0-beta.2
+      before_script: mv .github/PromiseKit.podspec .
+>>>>>>> Fix deploy
       script: |
         set -exo pipefail
         pod trunk push --verbose --allow-warnings | tee pod.log | ruby -e 'ARGF.each{ print "." }'
@@ -187,8 +193,12 @@ jobs:
         jazzy --config .github/jazzy.yml \
               --github_url "https://github.com/$TRAVIS_REPO_SLUG" \
               --module-version "$TRAVIS_TAG"
+<<<<<<< HEAD
         git remote update
         git fetch origin gh-pages:gh-pages --depth 1
+=======
+        git fetch origin
+>>>>>>> Fix deploy
         git checkout gh-pages
         rm -rf reference/v6
         mv output reference/v6
