@@ -84,7 +84,7 @@ class EmptyBox<T>: Box<T> {
 }
 
 
-extension Optional where Wrapped: DispatchQueue {
+extension Optional where Wrapped == QueueLike {
     @inline(__always)
     func async(flags: DispatchWorkItemFlags?, _ body: @escaping() -> Void) {
         switch self {
@@ -97,5 +97,27 @@ extension Optional where Wrapped: DispatchQueue {
                 q.async(execute: body)
             }
         }
+    }
+    
+    public static var main: QueueLike? {
+        return DispatchQueue.main
+    }
+}
+
+public protocol QueueLike: AnyObject {
+    func async(execute body: @escaping() -> Void)
+    func async(flags: DispatchWorkItemFlags?, execute body: @escaping() -> Void)
+}
+
+extension QueueLike {    
+    public func async(execute body: @escaping () -> Void) {
+        async(flags: nil, execute: body)
+    }
+}
+
+extension DispatchQueue: QueueLike {
+    public func async(flags: DispatchWorkItemFlags?, execute body: @escaping () -> Void) {
+        let workItem = DispatchWorkItem(qos: .unspecified, flags: flags ?? [], block: body)
+        async(execute: workItem)
     }
 }
